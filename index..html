@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tajweed Master | Learn Arabic Pronunciation</title>
+  
+  <!-- SEO and Social Sharing Meta Tags -->
+  <meta name="description" content="An interactive web app to learn and practice the pronunciation of Arabic letters with audio examples. Master your Tajweed skills today.">
+  <meta name="keywords" content="learn arabic, tajweed, arabic letters, pronunciation, islam, quran, arabic alphabet">
+  <meta property="og:title" content="Tajweed Master | Learn Arabic Pronunciation">
+  <meta property="og:description" content="The easiest way to master the pronunciation of Arabic letters with interactive examples.">
+  <meta property="og:type" content="website">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><path fill=%22%232563eb%22 d=%22M256 32C114.6 32 0 146.6 0 288c0 123.7 93.1 226.1 214.3 245.3c12.5 2.3 17.1-5.4 17.1-12.1c0-6-2.3-25-2.3-43.1c-81.1 17.7-98.3-33.6-98.3-33.6c-11.4-29.1-27.8-36.8-27.8-36.8c-22.7-15.5 1.7-15.2 1.7-15.2c25.2 1.8 38.4 25.9 38.4 25.9c22.4 38.3 58.7 27.2 73.1 20.8c2.3-16.2 8.7-27.2 15.9-33.6C121.1 414.9 52.4 386.1 52.4 275.4c0-27.3 9.7-49.6 25.9-67.1c-2.6-6.3-11.2-31.8 2.4-66.2c0 0 21.2-6.8 69.7 26.1c20.1-5.6 41.8-8.4 63.1-8.5c21.3 .1 43 2.9 63.1 8.5c48.5-32.9 69.7-26.1 69.7-26.1c13.6 34.4 5 59.8 2.4 66.2c16.2 17.5 25.9 39.8 25.9 67.1c0 111-68.8 139.4-169.5 145.8c9 7.8 17.1 23.2 17.1 46.5c0 33.6-.3 60.6-.3 68.8c0 6.7 4.6 14.4 17.2 12.1C418.9 514.1 512 411.7 512 288C512 146.6 397.4 32 256 32z%22/></svg>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #64748b;
+      --light: #f8fafc;
+      --white: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-image: linear-gradient(to bottom, var(--white), var(--light));
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+
+    .header { background: var(--white); padding: 20px 0; box-shadow: var(--shadow); margin-bottom: 30px; }
+    .header-content { text-align: center; }
+    .header h1 { font-size: 28px; color: var(--primary); font-weight: 700; }
+    .header p { color: var(--secondary); margin-top: 5px; }
+
+    .letters-section { background: var(--white); border-radius: var(--radius); padding: 25px; box-shadow: var(--shadow); }
+    .section-title { font-size: 24px; font-weight: 600; margin-bottom: 25px; text-align: center; color: var(--text); }
+    .letters-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+        gap: 15px; 
+        direction: rtl;
+    }
+    
+    .letter-btn { 
+      background: var(--white); 
+      border: 2px solid var(--border); 
+      border-radius: var(--radius); 
+      padding: 20px 10px; 
+      cursor: pointer; 
+      transition: all 0.2s ease; 
+      text-align: center; 
+      font-family: inherit;
+      position: relative;
+      opacity: 0;
+      transform: scale(0.9);
+      animation: fadeInScale 0.4s ease-out forwards;
+    }
+    @keyframes fadeInScale { to { opacity: 1; transform: scale(1); } }
+
+    .letter-btn:hover { border-color: var(--primary); transform: translateY(-3px) scale(1.03); box-shadow: var(--shadow); }
+    .letter-arabic { font-size: 30px; font-weight: bold; margin-bottom: 8px; }
+    .letter-name { font-size: 14px; color: var(--secondary); }
+    .letter-number {
+      position: absolute; top: 5px; right: 8px; font-size: 12px;
+      font-weight: bold; color: var(--primary); opacity: 0.7;
+    }
+
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(30, 41, 59, 0.7); display: flex; align-items: center; justify-content: center;
+        padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 1000;
+    }
+    .modal-overlay.visible { opacity: 1; pointer-events: auto; }
+    .modal-content {
+        background: var(--light); border-radius: var(--radius); padding: 30px;
+        width: 100%; max-width: 900px; max-height: 90vh;
+        overflow-y: auto; position: relative; transform: scale(0.95); transition: transform 0.3s ease;
+    }
+    .modal-overlay.visible .modal-content { transform: scale(1); }
+    .modal-close-btn {
+        position: absolute; top: 15px; right: 15px; background: transparent;
+        border: none; font-size: 24px; color: var(--secondary);
+        cursor: pointer; transition: color 0.2s ease; z-index: 10;
+    }
+    .modal-close-btn:hover { color: var(--primary); }
+    
+    .modal-header {
+        /* --- MODIFICATION 2: Changed justify-content to flex-start --- */
+        display: flex; justify-content: flex-start; align-items: center;
+        padding-bottom: 15px; border-bottom: 1px solid var(--border);
+        margin-bottom: 15px; gap: 10px;
+    }
+    .audio-controls { display: flex; gap: 8px; }
+    .control-btn {
+        background: var(--white); border: 1px solid var(--border); color: var(--primary);
+        height: 40px; padding: 0 15px; border-radius: var(--radius); cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        gap: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s ease;
+    }
+    .control-btn:hover { background: var(--primary); color: var(--white); transform: scale(1.05); }
+    .control-btn#pause-btn { display: none; }
+
+    .modal-table-header { text-align: center; margin-bottom: 20px; }
+    .table-title { font-size: 1.25rem; font-weight: 600; color: var(--text); }
+    .table-subtitle { font-size: 0.9rem; color: var(--secondary); margin-top: 4px; }
+
+    .examples-table-vertical { display: flex; flex-direction: column; gap: 10px; direction: rtl; }
+    .example-row { display: flex; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.2s ease; }
+    .example-row:hover { box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .example-row-cell { 
+        flex: 1; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; cursor: pointer; 
+        transition: all 0.2s ease; position: relative; 
+    }
+    .example-row-cell:first-child { border-left: 1px solid var(--border); }
+    .example-row-cell:hover { background-color: #f8fafc; transform: translateY(-2px); }
+
+    .example-header-row { background: transparent; border: none; margin-bottom: -5px; }
+    .example-header-row .example-row-cell { color: var(--secondary); font-size: 1rem; font-weight: 600; cursor: default; }
+    .example-header-row .example-row-cell:hover { background-color: transparent; transform: none; }
+
+    .example-row-cell.playing { background: var(--primary); color: var(--white); }
+    .example-row-cell.playing::after {
+        content: ''; position: absolute; display: block; width: 60%; height: 3px; border-radius: 2px;
+        background: var(--white); bottom: 8px; left: 50%; transform: translateX(-50%);
+        animation: scale-x-anim 0.3s ease forwards;
+    }
+    @keyframes scale-x-anim { from { transform: translateX(-50%) scaleX(0); } to { transform: translateX(-50%) scaleX(1); } }
+    
+    /* --- MODIFICATION 1: Styling for static contact button --- */
+    .footer {
+        text-align: center;
+        padding: 40px 20px 20px 20px;
+    }
+    .contact-btn {
+        background-color: var(--primary);
+        color: var(--white);
+        border: none;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        font-size: 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        padding: 12px 24px;
+        font-family: inherit;
+    }
+    .contact-btn:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px -2px rgba(0,0,0,0.15);
+    }
+    
+    .contact-modal-body { width: 100%; height: 70vh; }
+    .contact-modal-body iframe { width: 100%; height: 100%; border: 1px solid var(--border); border-radius: var(--radius); }
+
+    @media (max-width: 600px) {
+        .modal-content { padding: 20px; }
+        .example-row-cell { font-size: 20px; padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <h1>Arabic Letters Learning</h1>
+        <p>Interactive platform for learning Arabic letters</p>
+      </div>
+    </div>
+  </header>
+  
+  <main class="container">
+    <section class="letters-section">
+      <h2 class="section-title">Choose a Letter to Practice</h2>
+      <div class="letters-grid" id="letters-grid"></div>
+    </section>
+  </main>
+
+  <!-- --- MODIFICATION 1: Contact button moved to a footer --- -->
+  <footer class="footer">
+      <button class="contact-btn" id="contact-btn" title="Contact Us">
+          <i class="fas fa-envelope"></i>
+          <span>Contact Us</span>
+      </button>
+  </footer>
+
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-content" id="modal-content">
+        <button class="modal-close-btn" id="modal-close-btn"><i class="fas fa-times"></i></button>
+        <div class="modal-header">
+            <div class="audio-controls">
+                <button class="control-btn" id="play-all-btn" title="Play All"><i class="fas fa-play"></i><span>Play All</span></button>
+                <button class="control-btn" id="pause-btn" title="Pause"><i class="fas fa-pause"></i><span>Pause</span></button>
+                <button class="control-btn" id="stop-btn" title="Stop"><i class="fas fa-stop"></i><span>Stop</span></button>
+            </div>
+        </div>
+        <div class="modal-table-header" id="modal-table-header"></div>
+        <div class="examples-table-vertical" id="examples-table-vertical"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="contact-modal-overlay">
+    <div class="modal-content" id="contact-modal-content">
+        <button class="modal-close-btn" id="contact-modal-close-btn"><i class="fas fa-times"></i></button>
+        <!-- --- MODIFICATION 3: Removed header text from contact modal --- -->
+        <div class="contact-modal-body">
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfdPI4vhHsKVRvRsjozO9p9stHio0wG9TKtOg7X4tEdlendjA/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+        </div>
+    </div>
+  </div>
+
+  <script>
+    const githubBase = "https://raw.githubusercontent.com/Sa3dawii/tajweed-app/main";
+    const letters = [
+      { id: 1, name: "Hamza", arabic: "ء" }, { id: 2, name: "Ba", arabic: "ب" }, { id: 3, name: "Ta", arabic: "ت" },
+      { id: 4, name: "Tha", arabic: "ث" }, { id: 5, name: "Jeem", arabic: "ج" }, { id: 6, name: "Ha", arabic: "ح" },
+      { id: 7, name: "Kha", arabic: "خ" }, { id: 8, name: "Dal", arabic: "د" }, { id: 9, name: "Dhal", arabic: "ذ" },
+      { id: 10, name: "Ra", arabic: "ر" }, { id: 11, name: "Zay", arabic: "ز" }, { id: 12, name: "Seen", arabic: "س" },
+      { id: 13, name: "Sheen", arabic: "ش" }, { id: 14, name: "Saad", arabic: "ص" }, { id: 15, name: "Dhaad", arabic: "ض" },
+      { id: 16, name: "Taa", arabic: "ط" }, { id: 17, name: "Dhaa", arabic: "ظ" }, { id: 18, name: "Ayn", arabic: "ع" },
+      { id: 19, name: "Ghayn", arabic: "غ" }, { id: 20, name: "Fa", arabic: "ف" }, { id: 21, name: "Qaaf", arabic: "ق" },
+      { id: 22, name: "Kaaf", arabic: "ك" }, { id: 23, name: "Laam", arabic: "ل" }, { id: 24, name: "Meem", arabic: "م" },
+      { id: 25, name: "Noon", arabic: "ن" }, { id: 26, name: "Haa", arabic: "ه" }, { id: 27, name: "Waw", arabic: "و" },
+      { id: 28, name: "Yaa", arabic: "ي" }
+    ];
+
+    const lettersGrid = document.getElementById("letters-grid");
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    const modalTableHeader = document.getElementById('modal-table-header');
+    const examplesTableVertical = document.getElementById('examples-table-vertical');
+    const playAllBtn = document.getElementById('play-all-btn');
+    const pauseBtn = document.getElementById('pause-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    
+    const globalAudioPlayer = new Audio();
+    let audioQueue = [];
+    let currentTrackIndex = 0;
+    let isPaused = false;
+
+    letters.forEach((letter, index) => {
+      const btn = document.createElement("button");
+      btn.className = "letter-btn";
+      btn.innerHTML = `
+        <span class="letter-number">${letter.id}</span>
+        <div class="letter-arabic">${letter.arabic}</div>
+        <div class="letter-name">${letter.name}</div>`;
+      btn.style.animationDelay = `${index * 40}ms`;
+      btn.addEventListener("click", () => loadExamplesAndShowModal(letter.id));
+      lettersGrid.appendChild(btn);
+    });
+
+    async function loadExamplesAndShowModal(id) {
+      examplesTableVertical.innerHTML = `<p style="text-align:center;">Loading...</p>`;
+      modalOverlay.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+
+      try {
+        const res = await fetch(`${githubBase}/json/${id}.json`);
+        const data = await res.json();
+        populateModal(id, data);
+      } catch (err) {
+        console.error(err);
+        examplesTableVertical.innerHTML = `<p style="text-align:center;">Could not load examples.</p>`;
+      }
+    }
+    
+    function populateModal(id, data) {
+        audioQueue = [];
+        examplesTableVertical.innerHTML = '';
+        const letter = letters.find(l => l.id === id);
+        modalTableHeader.innerHTML = `
+            <p class="table-title">Practice the letter "${letter.name}"</p>
+            <p class="table-subtitle">Click on the form and its example to listen, then repeat.</p>`;
+
+        const headerRow = document.createElement("div");
+        headerRow.className = "example-row example-header-row";
+        headerRow.innerHTML = `<div class="example-row-cell">Form</div><div class="example-row-cell">Example</div>`;
+        examplesTableVertical.appendChild(headerRow);
+        
+        let soundCounter = 1;
+        audioQueue.push({ url: `${githubBase}/audio/${id}/Sound-${String(soundCounter++).padStart(2, '0')}.mp3`, element: null });
+        let dataIndex = 1;
+
+        if (id === 1) {
+            for (let i = 0; i < 3; i++) {
+                if (dataIndex >= data.length) break;
+                const row = document.createElement("div");
+                row.className = "example-row";
+                const formCell = document.createElement("div");
+                formCell.className = "example-row-cell";
+                formCell.textContent = "-";
+                const exampleCell = document.createElement("div");
+                exampleCell.className = "example-row-cell";
+                exampleCell.textContent = data[dataIndex].symbol;
+                const exampleUrl = `${githubBase}/audio/${id}/Sound-${String(soundCounter++).padStart(2, '0')}.mp3`;
+                exampleCell.addEventListener("click", () => playSoundOnClick(exampleUrl, exampleCell));
+                audioQueue.push({ url: exampleUrl, element: exampleCell });
+                row.appendChild(formCell); row.appendChild(exampleCell);
+                examplesTableVertical.appendChild(row);
+                dataIndex++;
+            }
+        }
+
+        while (dataIndex < data.length) {
+            if (dataIndex + 1 >= data.length) break;
+            const formItem = data[dataIndex];
+            const exampleItem = data[dataIndex + 1];
+            const row = document.createElement("div");
+            row.className = "example-row";
+            const formCell = document.createElement("div");
+            formCell.className = "example-row-cell";
+            formCell.textContent = formItem.symbol;
+            const exampleCell = document.createElement("div");
+            exampleCell.className = "example-row-cell";
+            exampleCell.textContent = exampleItem.symbol;
+            const formUrl = `${githubBase}/audio/${id}/Sound-${String(soundCounter++).padStart(2, '0')}.mp3`;
+            const exampleUrl = `${githubBase}/audio/${id}/Sound-${String(soundCounter++).padStart(2, '0')}.mp3`;
+            formCell.addEventListener("click", () => playSoundOnClick(formUrl, formCell));
+            exampleCell.addEventListener("click", () => playSoundOnClick(exampleUrl, exampleCell));
+            audioQueue.push({ url: formUrl, element: formCell });
+            audioQueue.push({ url: exampleUrl, element: exampleCell });
+            row.appendChild(formCell); row.appendChild(exampleCell);
+            examplesTableVertical.appendChild(row);
+            dataIndex += 2;
+        }
+    }
+
+    function closeModal() {
+        modalOverlay.classList.remove('visible');
+        stopQueue();
+        if (!document.getElementById('contact-modal-overlay').classList.contains('visible')) {
+            document.body.style.overflow = '';
+        }
+    }
+    modalCloseBtn.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) closeModal(); });
+
+    function playAudio(url, element) {
+        globalAudioPlayer.src = url;
+        globalAudioPlayer.play().catch(e => console.error("Audio play failed:", e));
+        document.querySelectorAll(".example-row-cell").forEach(el => el.classList.remove("playing"));
+        if (element) element.classList.add("playing");
+        globalAudioPlayer.onerror = () => { if (element) element.classList.remove("playing"); };
+    }
+    function playSoundOnClick(url, element) {
+        stopQueue(); playAudio(url, element);
+        globalAudioPlayer.onended = () => { if (element) element.classList.remove("playing"); };
+    }
+    function playCurrentTrack() {
+        if (currentTrackIndex >= audioQueue.length) { stopQueue(); return; }
+        isPaused = false;
+        const track = audioQueue[currentTrackIndex];
+        playAudio(track.url, track.element);
+        globalAudioPlayer.onended = () => {
+            if (track.element) track.element.classList.remove("playing");
+            currentTrackIndex++;
+            playCurrentTrack();
+        };
+    }
+    function stopQueue() {
+        globalAudioPlayer.pause(); globalAudioPlayer.currentTime = 0;
+        document.querySelectorAll(".example-row-cell").forEach(el => el.classList.remove("playing"));
+        isPaused = false; currentTrackIndex = 0;
+        playAllBtn.style.display = 'flex'; pauseBtn.style.display = 'none';
+        playAllBtn.querySelector('span').textContent = 'Play All';
+        playAllBtn.title = 'Play All';
+    }
+    playAllBtn.addEventListener('click', () => {
+        if (isPaused) {
+            globalAudioPlayer.play();
+            if (audioQueue[currentTrackIndex] && audioQueue[currentTrackIndex].element) {
+                audioQueue[currentTrackIndex].element.classList.add("playing");
+            }
+        } else { currentTrackIndex = 0; playCurrentTrack(); }
+        isPaused = false; playAllBtn.style.display = 'none'; pauseBtn.style.display = 'flex';
+    });
+    pauseBtn.addEventListener('click', () => {
+        globalAudioPlayer.pause(); isPaused = true;
+        document.querySelectorAll(".example-row-cell").forEach(el => el.classList.remove("playing"));
+        playAllBtn.style.display = 'flex'; pauseBtn.style.display = 'none';
+        playAllBtn.querySelector('span').textContent = 'Resume';
+        playAllBtn.title = 'Resume';
+    });
+    stopBtn.addEventListener('click', stopQueue);
+
+    const contactBtn = document.getElementById('contact-btn');
+    const contactModalOverlay = document.getElementById('contact-modal-overlay');
+    const contactModalCloseBtn = document.getElementById('contact-modal-close-btn');
+    function openContactModal() {
+        contactModalOverlay.classList.add('visible'); document.body.style.overflow = 'hidden';
+    }
+    function closeContactModal() {
+        contactModalOverlay.classList.remove('visible');
+        if (!modalOverlay.classList.contains('visible')) { document.body.style.overflow = ''; }
+    }
+    contactBtn.addEventListener('click', openContactModal);
+    contactModalCloseBtn.addEventListener('click', closeContactModal);
+    contactModalOverlay.addEventListener('click', (event) => { if (event.target === contactModalOverlay) closeContactModal(); });
+  </script>
+</body>
+</html>
